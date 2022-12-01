@@ -1,11 +1,9 @@
----
-title: "Statistical Learning"
-author: "Daisy Yan"
-date: "2022-12-01"
-output: github_document
----
+Statistical Learning
+================
+Daisy Yan
+2022-12-01
 
-```{r message=FALSE}
+``` r
 library(tidyverse)
 library(glmnet)
 
@@ -14,7 +12,7 @@ set.seed(1)
 
 ## Lasso
 
-```{r message=FALSE}
+``` r
 bwt_df = 
   read_csv("./data/birthweight.csv") %>% 
   janitor::clean_names() %>%
@@ -33,14 +31,14 @@ bwt_df =
 
 Inputs for `glmnet`.
 
-```{r}
+``` r
 x = model.matrix(bwt ~ ., bwt_df)[,-1]
 y = bwt_df$bwt
 ```
 
 Fit lasso!
 
-```{r}
+``` r
 lambda = 10^(seq(3, -2, -0.1))
 
 lasso_fit =
@@ -52,8 +50,7 @@ lasso_cv =
 lambda_opt = lasso_cv$lambda.min
 ```
 
-
-```{r}
+``` r
 broom::tidy(lasso_fit) %>% 
   select(term, lambda, estimate) %>% 
   complete(term, lambda, fill = list(estimate = 0) ) %>% 
@@ -64,30 +61,36 @@ broom::tidy(lasso_fit) %>%
   theme(legend.position = "none")
 ```
 
-```{r}
+![](stat_learn_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
 broom::tidy(lasso_cv) %>% 
   ggplot(aes(x = log(lambda, 10), y = estimate)) + 
   geom_point()  
 ```
 
+![](stat_learn_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
 ## Clustering
 
-```{r message=FALSE}
+``` r
 poke_df = 
   read_csv("./data/pokemon.csv") %>% 
   janitor::clean_names() %>% 
   select(hp, speed)
 ```
 
-```{r}
+``` r
 poke_df %>% 
   ggplot(aes(x = hp, y = speed)) + 
   geom_point()
 ```
 
+![](stat_learn_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
 Run K means.
 
-```{r}
+``` r
 kmeans_fit =
   kmeans(x = poke_df, centers = 3)
 
@@ -98,7 +101,10 @@ poke_df %>%
   ggplot(aes(x = hp, y = speed, color = .cluster)) +
   geom_point()
 ```
-```{r}
+
+![](stat_learn_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+``` r
 clusts =
   tibble(k = 2:4) %>%
   mutate(
@@ -114,3 +120,4 @@ clusts %>%
   facet_grid(~k)
 ```
 
+![](stat_learn_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
